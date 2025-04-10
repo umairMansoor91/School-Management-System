@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./sms
+      dockerfile: Dockerfile
+    volumes:
+      - ./sms:/app
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: ./smsf
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
