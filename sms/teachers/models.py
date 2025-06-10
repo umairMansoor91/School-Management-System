@@ -10,6 +10,7 @@ class Teacher(models.Model):
     pay = models.IntegerField(default=0)
     joining_date = models.DateField(auto_now_add=True)
     enrolled = models.BooleanField(default=True)
+    teacher_doc = models.FileField(upload_to='scanned_docs_teachers/', null=True, blank=True)
 
     def __str__(self):
         return f"Mr. {self.name}"

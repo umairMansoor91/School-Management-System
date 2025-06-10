@@ -4,7 +4,7 @@ from teachers.models import Teacher, TeacherPay, GenerateTeacherPay
 # Register your models here.
 @admin.register(Teacher)
 class TeacherAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "contact", "cnic", "qualification", "pay", "joining_date", "enrolled")
+    list_display = ("id", "name", "contact", "cnic", "qualification", "pay", "joining_date","teacher_doc", "enrolled")
     list_filter = ("enrolled",)
 
 

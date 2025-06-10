@@ -4,13 +4,13 @@ from students.models import Student, StudentFee, Alumni, FeeGeneration
 # Register your models here.
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
-    list_display = ("roll_no", "name", "father_name", "grade", 'contact', "DOB", 'admission_date',  "address", "tution_fee", "security_fee","scanned_doc", "enrolled")
+    list_display = ("roll_no", "name", "father_name", "grade", 'contact', "DOB", 'admission_date',  "address", "tuition_fee", "security_fee","scanned_doc","pending_fee", "enrolled")
     search_fields = ("name", "roll_number", "grade")
     list_filter = ("grade",)
 
 @admin.register(StudentFee)
 class StudentFeeAdmin(admin.ModelAdmin):
-    list_display = ('student', 'month', 'tuition_fee', 'exam_fee', 'ac_charges', 'stationary_charges', 'security_fee', 'admission_fee','total_fee', 'paid')
+    list_display = ('student', 'month', 'tuition_fee', 'exam_fee', 'ac_charges', 'stationary_charges', 'security_fee', 'admission_fee','pending','total_fee','amount_paid','balance', 'paid')
     search_fields = ('student__name', 'month', 'paid')
     list_filter = ('month', 'student__grade', 'paid')
 

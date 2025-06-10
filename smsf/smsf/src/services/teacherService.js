@@ -14,12 +14,20 @@ const teacherService = {
   
   // Create new teacher
   createTeacher: (teacherData) => {
-    return api.post('/api/teacher/', teacherData);
+    return api.post('/api/teacher/', teacherData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
   },
   
   // Update teacher
   updateTeacher: (id, teacherData) => {
-    return api.put(`/api/teacher/${id}/`, teacherData);
+    return api.put(`/api/teacher/${id}/`, teacherData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
   },
   
   // Delete teacher

@@ -15,9 +15,10 @@ const StudentForm = () => {
     DOB: '',
     admission_date: new Date().toISOString().split('T')[0],
     address: '',
-    tution_fee: '',
+    tuition_fee: '', // Fixed typo from 'tution_fee'
     security_fee: '',
     admission_fee: '',
+    pending_fee: '',
     enrolled: true
   });
   
@@ -88,9 +89,10 @@ const StudentForm = () => {
       const dataToSubmit = {
         ...formData,
         grade: parseInt(formData.grade, 10),
-        tution_fee: parseFloat(formData.tution_fee || 0),
+        tuition_fee: parseFloat(formData.tuition_fee || 0), // Fixed field name
         security_fee: parseFloat(formData.security_fee || 0),
-        admission_fee: parseFloat(formData.admission_fee || 0)
+        admission_fee: parseFloat(formData.admission_fee || 0),
+        pending_fee: parseFloat(formData.pending_fee || 0)
       };
   
       // Create FormData object for multipart/form-data
@@ -360,24 +362,24 @@ const StudentForm = () => {
                 <h5 className="border-bottom pb-2 text-secondary">Fee Structure</h5>
               </div>
               
-              <div className="col-md-4">
+              <div className="col-md-3">
                 <div className="form-floating mb-3">
                   <input
                     type="number"
                     step="0.01"
                     className="form-control"
-                    id="tution_fee"
-                    name="tution_fee"
+                    id="tuition_fee"
+                    name="tuition_fee"
                     placeholder="Tuition Fee"
-                    value={formData.tution_fee}
+                    value={formData.tuition_fee}
                     onChange={handleChange}
                     required
                   />
-                  <label htmlFor="tution_fee">Tuition Fee (Rs.)</label>
+                  <label htmlFor="tuition_fee">Tuition Fee (Rs.)</label>
                 </div>
               </div>
               
-              <div className="col-md-4">
+              <div className="col-md-3">
                 <div className="form-floating mb-3">
                   <input
                     type="number"
@@ -394,7 +396,7 @@ const StudentForm = () => {
                 </div>
               </div>
               
-              <div className="col-md-4">
+              <div className="col-md-3">
                 <div className="form-floating mb-3">
                   <input
                     type="number"
@@ -410,6 +412,40 @@ const StudentForm = () => {
                   <label htmlFor="admission_fee">Admission Fee (Rs.)</label>
                 </div>
               </div>
+              
+              <div className="col-md-3">
+                <div className="form-floating mb-3">
+                  <input
+                    type="number"
+                    step="0.01"
+                    className="form-control"
+                    id="pending_fee"
+                    name="pending_fee"
+                    placeholder="Pending Fee"
+                    value={formData.pending_fee}
+                    onChange={handleChange}
+                    readOnly={isEditMode} // Make it read-only in edit mode since it's calculated
+                  />
+                  <label htmlFor="pending_fee">Pending Fee (Rs.)</label>
+                  {isEditMode && (
+                    <div className="form-text">
+                      <small className="text-info">
+                        <i className="bi bi-info-circle"></i> This is automatically calculated from fee records
+                      </small>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Show pending fee info in edit mode */}
+              {isEditMode && formData.pending_fee > 0 && (
+                <div className="col-12">
+                  <div className="alert alert-warning">
+                    <i className="bi bi-exclamation-triangle-fill me-2"></i>
+                    <strong>Outstanding Balance:</strong> This student has a pending fee of Rs. {formData.pending_fee}
+                  </div>
+                </div>
+              )}
             </div>
             
             {/* Action Buttons */}

@@ -30,9 +30,9 @@ class StudentFeeSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'student', 'student_info', 'month', 'tuition_fee', 'exam_fee', 'ac_charges',
             'stationary_charges', 'admission_fee', 'lab_charges', 'security_fee', 'misc', 'description',
-            'total_fee', 'paid'
+            'pending', 'total_fee', 'amount_paid', 'balance', 'paid'  
         ]
-        read_only_fields = ['total_fee']
+        read_only_fields = ['total_fee', 'balance']  
 
     def update(self, instance, validated_data):
         # Extract and update nested student info

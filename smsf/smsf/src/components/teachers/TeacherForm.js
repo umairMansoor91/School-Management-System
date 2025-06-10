@@ -14,9 +14,11 @@ const TeacherForm = () => {
     qualification: '',
     pay: '',
     joining_date: '',
-    enrolled: true
+    enrolled: true,
+    teacher_doc: null
   });
   
+  const [filePreview, setFilePreview] = useState(null);
   const [loading, setLoading] = useState(isEditMode);
   const [error, setError] = useState(null);
 
@@ -26,6 +28,9 @@ const TeacherForm = () => {
         try {
           const response = await teacherService.getTeacher(id);
           setFormData(response.data);
+          if (response.data.teacher_doc) {
+            setFilePreview(response.data.teacher_doc);
+          }
           setLoading(false);
         } catch (err) {
           setError('Failed to fetch teacher details');
@@ -46,15 +51,41 @@ const TeacherForm = () => {
     });
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData({
+        ...formData,
+        teacher_doc: file
+      });
+      
+      // Create a preview URL for the file
+      const fileUrl = URL.createObjectURL(file);
+      setFilePreview(fileUrl);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     
     try {
+      // Create FormData object for file upload
+      const teacherFormData = new FormData();
+      
+      // Append all form fields to FormData
+      Object.keys(formData).forEach(key => {
+        if (key === 'teacher_doc' && formData[key] instanceof File) {
+          teacherFormData.append(key, formData[key]);
+        } else if (key !== 'teacher_doc' || formData[key] !== null) {
+          teacherFormData.append(key, formData[key]);
+        }
+      });
+      
       if (isEditMode) {
-        await teacherService.updateTeacher(id, formData);
+        await teacherService.updateTeacher(id, teacherFormData);
       } else {
-        await teacherService.createTeacher(formData);
+        await teacherService.createTeacher(teacherFormData);
       }
       navigate('/teachers');
     } catch (err) {
@@ -83,7 +114,7 @@ const TeacherForm = () => {
             <div className="card-body">
               {error && <div className="alert alert-danger">{error}</div>}
               
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={handleSubmit} encType="multipart/form-data">
                 <div className="row">
                   <div className="col-md-6 mb-3">
                     <label htmlFor="name" className="form-label fw-bold">Full Name</label>
@@ -173,6 +204,39 @@ const TeacherForm = () => {
                       onChange={handleChange}
                       required
                     />
+                  </div>
+                </div>
+                
+                <div className="row mb-3">
+                  <div className="col-12">
+                    <label htmlFor="teacher_doc" className="form-label fw-bold">Document Upload</label>
+                    <input
+                      type="file"
+                      className="form-control"
+                      id="teacher_doc"
+                      name="teacher_doc"
+                      onChange={handleFileChange}
+                    />
+                    <div className="form-text">Upload teacher documents (resume, certificates, etc.)</div>
+                    
+                    {filePreview && (
+                      <div className="mt-2">
+                        <label className="form-label">Current Document:</label>
+                        <div className="d-flex align-items-center">
+                          <div className="border p-2 rounded me-2">
+                            <i className="bi bi-file-earmark-text fs-4"></i>
+                          </div>
+                          <a 
+                            href={filePreview} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="text-primary text-decoration-none"
+                          >
+                            View Document
+                          </a>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
                 

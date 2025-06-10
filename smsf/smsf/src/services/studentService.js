@@ -29,7 +29,11 @@ const studentService = {
   updateStudent: (id, studentData) => {
     // Check if studentData is FormData (for file uploads) or regular object
     if (studentData instanceof FormData) {
-      return api.patch(`/api/students/${id}/`, studentData);  // Let the browser set the content type
+      return api.patch(`/api/students/${id}/`, studentData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+    });  
     }
     return api.patch(`/api/students/${id}/`, studentData);
   },

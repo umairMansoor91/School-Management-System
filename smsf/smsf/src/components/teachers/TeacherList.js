@@ -14,7 +14,8 @@ const TeacherList = () => {
     qualification: '',
     status: 'all', // 'all', 'active', or 'inactive'
     minSalary: '',
-    maxSalary: ''
+    maxSalary: '',
+    hasDocument: 'all' // 'all', 'yes', or 'no'
   });
 
   // Get all unique qualifications for the dropdown
@@ -71,6 +72,12 @@ const TeacherList = () => {
         result = result.filter(teacher => teacher.pay <= Number(filters.maxSalary));
       }
       
+      // Filter by document presence
+      if (filters.hasDocument !== 'all') {
+        const hasDoc = filters.hasDocument === 'yes';
+        result = result.filter(teacher => hasDoc ? !!teacher.teacher_doc : !teacher.teacher_doc);
+      }
+      
       setFilteredTeachers(result);
     };
     
@@ -91,7 +98,8 @@ const TeacherList = () => {
       qualification: '',
       status: 'all',
       minSalary: '',
-      maxSalary: ''
+      maxSalary: '',
+      hasDocument: 'all'
     });
   };
 
@@ -124,7 +132,7 @@ const TeacherList = () => {
               />
             </div>
             
-            <div className="col-md-3">
+            <div className="col-md-2">
               <label className="form-label">Qualification</label>
               <select
                 className="form-select"
@@ -154,6 +162,20 @@ const TeacherList = () => {
             </div>
             
             <div className="col-md-2">
+              <label className="form-label">Has Document</label>
+              <select
+                className="form-select"
+                name="hasDocument"
+                value={filters.hasDocument}
+                onChange={handleFilterChange}
+              >
+                <option value="all">All</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+              </select>
+            </div>
+            
+            <div className="col-md-1.5">
               <label className="form-label">Min Salary</label>
               <input
                 type="number"
@@ -165,7 +187,7 @@ const TeacherList = () => {
               />
             </div>
             
-            <div className="col-md-2">
+            <div className="col-md-1.5">
               <label className="form-label">Max Salary</label>
               <input
                 type="number"
@@ -211,6 +233,7 @@ const TeacherList = () => {
                 <th>Salary</th>
                 <th>Joining Date</th>
                 <th>Status</th>
+                <th>Document</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -228,6 +251,21 @@ const TeacherList = () => {
                     <span className={`badge ${teacher.enrolled ? 'bg-success' : 'bg-danger'}`}>
                       {teacher.enrolled ? 'Active' : 'Inactive'}
                     </span>
+                  </td>
+                  <td>
+                    {teacher.teacher_doc ? (
+                      <a 
+                        href={teacher.teacher_doc} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="btn btn-sm btn-outline-info"
+                      >
+                        <i className="bi bi-file-earmark-text me-1"></i>
+                        View
+                      </a>
+                    ) : (
+                      <span className="badge bg-secondary">No Document</span>
+                    )}
                   </td>
                   <td>
                     <Link 

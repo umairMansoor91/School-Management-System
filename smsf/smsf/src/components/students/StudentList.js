@@ -10,17 +10,24 @@ const StudentList = () => {
   const [error, setError] = useState(null);
   const [showFeeForm, setShowFeeForm] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState(null);
-  const navigate = useNavigate(); // Add this for programmatic navigation
+  const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
   
-  // Filter states
+  // Filter states - updated to match backend fields
   const [filters, setFilters] = useState({
     name: '',
     fatherName: '',
     grade: '',
     status: 'all', // 'all', 'enrolled', or 'not-enrolled'
     contactNumber: '',
+    minTuitionFee: '',
+    maxTuitionFee: '',
     minSecurityFee: '',
     maxSecurityFee: '',
+    minAdmissionFee: '',
+    maxAdmissionFee: '',
+    minPendingFee: '',
+    maxPendingFee: '',
     hasDocument: 'all' // 'all', 'yes', or 'no'
   });
 
@@ -81,16 +88,55 @@ const StudentList = () => {
         );
       }
       
+      // Filter by tuition fee range
+      if (filters.minTuitionFee) {
+        result = result.filter(student => 
+          parseFloat(student.tuition_fee) >= parseFloat(filters.minTuitionFee)
+        );
+      }
+      
+      if (filters.maxTuitionFee) {
+        result = result.filter(student => 
+          parseFloat(student.tuition_fee) <= parseFloat(filters.maxTuitionFee)
+        );
+      }
+      
       // Filter by security fee range
       if (filters.minSecurityFee) {
         result = result.filter(student => 
-          student.security_fee >= Number(filters.minSecurityFee)
+          parseFloat(student.security_fee) >= parseFloat(filters.minSecurityFee)
         );
       }
       
       if (filters.maxSecurityFee) {
         result = result.filter(student => 
-          student.security_fee <= Number(filters.maxSecurityFee)
+          parseFloat(student.security_fee) <= parseFloat(filters.maxSecurityFee)
+        );
+      }
+      
+      // Filter by admission fee range
+      if (filters.minAdmissionFee) {
+        result = result.filter(student => 
+          parseFloat(student.admission_fee) >= parseFloat(filters.minAdmissionFee)
+        );
+      }
+      
+      if (filters.maxAdmissionFee) {
+        result = result.filter(student => 
+          parseFloat(student.admission_fee) <= parseFloat(filters.maxAdmissionFee)
+        );
+      }
+      
+      // Filter by pending fee range
+      if (filters.minPendingFee) {
+        result = result.filter(student => 
+          parseFloat(student.pending_fee) >= parseFloat(filters.minPendingFee)
+        );
+      }
+      
+      if (filters.maxPendingFee) {
+        result = result.filter(student => 
+          parseFloat(student.pending_fee) <= parseFloat(filters.maxPendingFee)
         );
       }
       
@@ -123,8 +169,14 @@ const StudentList = () => {
       grade: '',
       status: 'all',
       contactNumber: '',
+      minTuitionFee: '',
+      maxTuitionFee: '',
       minSecurityFee: '',
       maxSecurityFee: '',
+      minAdmissionFee: '',
+      maxAdmissionFee: '',
+      minPendingFee: '',
+      maxPendingFee: '',
       hasDocument: 'all'
     });
   };
@@ -148,10 +200,12 @@ const StudentList = () => {
   
   const openDocumentModal = (docUrl) => {
     setSelectedDocument(docUrl);
+    setShowModal(true);
   };
   
   const closeDocumentModal = () => {
     setSelectedDocument(null);
+    setShowModal(false);
   };
 
   // Handle navigation to add new student
@@ -162,6 +216,20 @@ const StudentList = () => {
   // Handle navigation to edit student
   const handleEditStudent = (id) => {
     navigate(`/students/edit/${id}`);
+  };
+
+  // Format currency display
+  const formatCurrency = (amount) => {
+    return parseFloat(amount || 0).toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  };
+
+  // Format date display
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString();
   };
 
   if (loading) return <div className="text-center mt-5"><div className="spinner-border" role="status"></div></div>;
@@ -178,7 +246,7 @@ const StudentList = () => {
   }
 
   return (
-    <div className="container mt-4">
+    <div className="container-fluid mt-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2>Students</h2>
         <div className="d-flex gap-2">
@@ -196,11 +264,11 @@ const StudentList = () => {
         </div>
         <div className="card-body">
           <div className="row g-3">
-            <div className="col-md-4 col-lg-3">
+            <div className="col-md-3 col-lg-2">
               <label className="form-label">Student Name</label>
               <input
                 type="text"
-                className="form-control"
+                className="form-control form-control-sm"
                 name="name"
                 value={filters.name}
                 onChange={handleFilterChange}
@@ -208,11 +276,11 @@ const StudentList = () => {
               />
             </div>
             
-            <div className="col-md-4 col-lg-3">
+            <div className="col-md-3 col-lg-2">
               <label className="form-label">Father's Name</label>
               <input
                 type="text"
-                className="form-control"
+                className="form-control form-control-sm"
                 name="fatherName"
                 value={filters.fatherName}
                 onChange={handleFilterChange}
@@ -220,25 +288,25 @@ const StudentList = () => {
               />
             </div>
             
-            <div className="col-md-4 col-lg-2">
+            <div className="col-md-2 col-lg-1">
               <label className="form-label">Grade</label>
               <select
-                className="form-select"
+                className="form-select form-select-sm"
                 name="grade"
                 value={filters.grade}
                 onChange={handleFilterChange}
               >
-                <option value="">All Grades</option>
+                <option value="">All</option>
                 {uniqueGrades.map((grade, index) => (
                   <option key={index} value={grade}>{grade}</option>
                 ))}
               </select>
             </div>
             
-            <div className="col-md-4 col-lg-2">
+            <div className="col-md-2 col-lg-1">
               <label className="form-label">Status</label>
               <select
-                className="form-select"
+                className="form-select form-select-sm"
                 name="status"
                 value={filters.status}
                 onChange={handleFilterChange}
@@ -249,25 +317,11 @@ const StudentList = () => {
               </select>
             </div>
             
-            <div className="col-md-4 col-lg-2">
-              <label className="form-label">Has Document</label>
-              <select
-                className="form-select"
-                name="hasDocument"
-                value={filters.hasDocument}
-                onChange={handleFilterChange}
-              >
-                <option value="all">All</option>
-                <option value="yes">With Document</option>
-                <option value="no">No Document</option>
-              </select>
-            </div>
-            
-            <div className="col-md-4 col-lg-2">
+            <div className="col-md-2 col-lg-2">
               <label className="form-label">Contact</label>
               <input
                 type="text"
-                className="form-control"
+                className="form-control form-control-sm"
                 name="contactNumber"
                 value={filters.contactNumber}
                 onChange={handleFilterChange}
@@ -275,34 +329,121 @@ const StudentList = () => {
               />
             </div>
             
-            <div className="col-md-4 col-lg-2">
-              <label className="form-label">Min Security Fee</label>
+            <div className="col-md-2 col-lg-1">
+              <label className="form-label">Document</label>
+              <select
+                className="form-select form-select-sm"
+                name="hasDocument"
+                value={filters.hasDocument}
+                onChange={handleFilterChange}
+              >
+                <option value="all">All</option>
+                <option value="yes">With Doc</option>
+                <option value="no">No Doc</option>
+              </select>
+            </div>
+            
+            {/* Fee Range Filters */}
+            <div className="col-md-2 col-lg-1">
+              <label className="form-label">Min Tuition</label>
               <input
                 type="number"
-                className="form-control"
-                name="minSecurityFee"
-                value={filters.minSecurityFee}
+                className="form-control form-control-sm"
+                name="minTuitionFee"
+                value={filters.minTuitionFee}
                 onChange={handleFilterChange}
-                placeholder="Min fee"
+                placeholder="Min"
               />
             </div>
             
-            <div className="col-md-4 col-lg-2">
-              <label className="form-label">Max Security Fee</label>
+            <div className="col-md-2 col-lg-1">
+              <label className="form-label">Max Tuition</label>
               <input
                 type="number"
-                className="form-control"
+                className="form-control form-control-sm"
+                name="maxTuitionFee"
+                value={filters.maxTuitionFee}
+                onChange={handleFilterChange}
+                placeholder="Max"
+              />
+            </div>
+            
+            <div className="col-md-2 col-lg-1">
+              <label className="form-label">Min Security</label>
+              <input
+                type="number"
+                className="form-control form-control-sm"
+                name="minSecurityFee"
+                value={filters.minSecurityFee}
+                onChange={handleFilterChange}
+                placeholder="Min"
+              />
+            </div>
+            
+            <div className="col-md-2 col-lg-1">
+              <label className="form-label">Max Security</label>
+              <input
+                type="number"
+                className="form-control form-control-sm"
                 name="maxSecurityFee"
                 value={filters.maxSecurityFee}
                 onChange={handleFilterChange}
-                placeholder="Max fee"
+                placeholder="Max"
+              />
+            </div>
+            
+            <div className="col-md-2 col-lg-1">
+              <label className="form-label">Min Admission</label>
+              <input
+                type="number"
+                className="form-control form-control-sm"
+                name="minAdmissionFee"
+                value={filters.minAdmissionFee}
+                onChange={handleFilterChange}
+                placeholder="Min"
+              />
+            </div>
+            
+            <div className="col-md-2 col-lg-1">
+              <label className="form-label">Max Admission</label>
+              <input
+                type="number"
+                className="form-control form-control-sm"
+                name="maxAdmissionFee"
+                value={filters.maxAdmissionFee}
+                onChange={handleFilterChange}
+                placeholder="Max"
+              />
+            </div>
+            
+            <div className="col-md-2 col-lg-1">
+              <label className="form-label">Min Pending</label>
+              <input
+                type="number"
+                className="form-control form-control-sm"
+                name="minPendingFee"
+                value={filters.minPendingFee}
+                onChange={handleFilterChange}
+                placeholder="Min"
+              />
+            </div>
+            
+            <div className="col-md-2 col-lg-1">
+              <label className="form-label">Max Pending</label>
+              <input
+                type="number"
+                className="form-control form-control-sm"
+                name="maxPendingFee"
+                value={filters.maxPendingFee}
+                onChange={handleFilterChange}
+                placeholder="Max"
               />
             </div>
           </div>
           
           <div className="d-flex justify-content-end mt-3">
             <button 
-              className="btn btn-secondary" 
+              className="btn btn-secondary btn-sm" 
               onClick={clearFilters}
             >
               Clear Filters
@@ -322,7 +463,7 @@ const StudentList = () => {
         <div className="alert alert-info">No students found matching the filters</div>
       ) : (
         <div className="table-responsive">
-          <table className="table table-striped table-hover">
+          <table className="table table-striped table-hover table-sm">
             <thead className="table-dark">
               <tr>
                 <th>Roll No</th>
@@ -332,7 +473,10 @@ const StudentList = () => {
                 <th>Contact</th>
                 <th>DOB</th>
                 <th>Admission Date</th>
+                <th>Tuition Fee</th>
                 <th>Security Fee</th>
+                <th>Admission Fee</th>
+                <th>Pending Fee</th>
                 <th>Status</th>
                 <th>Document</th>
                 <th>Actions</th>
@@ -346,9 +490,16 @@ const StudentList = () => {
                   <td>{student.father_name}</td>
                   <td>{student.grade}</td>
                   <td>{student.contact}</td>
-                  <td>{new Date(student.DOB).toLocaleDateString()}</td>
-                  <td>{new Date(student.admission_date).toLocaleDateString()}</td>
-                  <td>{student.security_fee}</td>
+                  <td>{formatDate(student.DOB)}</td>
+                  <td>{formatDate(student.admission_date)}</td>
+                  <td>Rs{formatCurrency(student.tuition_fee)}</td>
+                  <td>Rs{formatCurrency(student.security_fee)}</td>
+                  <td>Rs{formatCurrency(student.admission_fee)}</td>
+                  <td>
+                    <span className={`badge ${parseFloat(student.pending_fee) > 0 ? 'bg-warning text-dark' : 'bg-success'}`}>
+                      Rs{formatCurrency(student.pending_fee)}
+                    </span>
+                  </td>
                   <td>
                     <span className={`badge ${student.enrolled ? 'bg-success' : 'bg-danger'}`}>
                       {student.enrolled ? 'Enrolled' : 'Not Enrolled'}
@@ -368,18 +519,20 @@ const StudentList = () => {
                     )}
                   </td>
                   <td>
-                    <div className="d-flex gap-2">
+                    <div className="d-flex gap-1">
                       <button
                         className="btn btn-sm btn-warning"
                         onClick={() => handleEditStudent(student.roll_no)}
+                        title="Edit Student"
                       >
-                        <i className="bi bi-pencil"></i> Edit
+                        <i className="bi bi-pencil"></i>
                       </button>
                       <button 
                         className="btn btn-sm btn-danger"
                         onClick={() => handleDelete(student.roll_no)}
+                        title="Delete Student"
                       >
-                        <i className="bi bi-trash"></i> Delete
+                        <i className="bi bi-trash"></i>
                       </button>
                     </div>
                   </td>
@@ -391,7 +544,7 @@ const StudentList = () => {
       )}
       
       {/* Document Modal */}
-      {selectedDocument && (
+      {selectedDocument && showModal && (
         <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog modal-lg">
             <div className="modal-content">
@@ -427,7 +580,7 @@ const StudentList = () => {
                   rel="noopener noreferrer" 
                   className="btn btn-primary"
                 >
-                  <i className="bi bi-download"></i> Download
+                  <i className="bi bi-download"></i> Download Document
                 </a>
                 <button type="button" className="btn btn-secondary" onClick={closeDocumentModal}>
                   Close

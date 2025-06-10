@@ -318,6 +318,84 @@ const Dashboard = () => {
           </Col>
         </Row>
       )}
+
+      {/* Total Metrics Row */}
+      {!loading && allLedgerData.length > 0 && (
+        <Row className="g-3 mb-4">
+          <Col xs={12}>
+            <Card className="shadow-sm border-0 bg-light">
+              <Card.Body className="p-3">
+                <h5 className="mb-3">Total Metrics</h5>
+                <Row>
+                  <Col lg={3} sm={6} className="mb-3 mb-lg-0">
+                    <div className="d-flex align-items-center">
+                      <div className="rounded-circle bg-success bg-opacity-10 p-2 me-3 d-flex align-items-center justify-content-center">
+                        <i className="bi bi-cash-stack text-success fs-4"></i>
+                      </div>
+                      <div>
+                        <h6 className="text-muted mb-0">Total Revenue</h6>
+                        <h4 className="mb-0">
+                          {formatCurrency(
+                            allLedgerData.reduce((sum, item) => sum + parseFloat(item.MonthlyStudentFees), 0)
+                          )}
+                        </h4>
+                      </div>
+                    </div>
+                  </Col>
+                  
+                  <Col lg={3} sm={6} className="mb-3 mb-lg-0">
+                    <div className="d-flex align-items-center">
+                      <div className="rounded-circle bg-primary bg-opacity-10 p-2 me-3 d-flex align-items-center justify-content-center">
+                        <i className="bi bi-wallet2 text-primary fs-4"></i>
+                      </div>
+                      <div>
+                        <h6 className="text-muted mb-0">Total Teacher Pay</h6>
+                        <h4 className="mb-0">
+                          {formatCurrency(
+                            allLedgerData.reduce((sum, item) => sum + parseFloat(item.MonthlyTeacherPays), 0)
+                          )}
+                        </h4>
+                      </div>
+                    </div>
+                  </Col>
+                  
+                  <Col lg={3} sm={6} className="mb-3 mb-sm-0">
+                    <div className="d-flex align-items-center">
+                      <div className="rounded-circle bg-danger bg-opacity-10 p-2 me-3 d-flex align-items-center justify-content-center">
+                        <i className="bi bi-credit-card text-danger fs-4"></i>
+                      </div>
+                      <div>
+                        <h6 className="text-muted mb-0">Total Expenses</h6>
+                        <h4 className="mb-0">
+                          {formatCurrency(
+                            allLedgerData.reduce((sum, item) => sum + parseFloat(item.MonthlyExpenses), 0)
+                          )}
+                        </h4>
+                      </div>
+                    </div>
+                  </Col>
+                  
+                  <Col lg={3} sm={6}>
+                    <div className="d-flex align-items-center">
+                      <div className="rounded-circle bg-warning bg-opacity-10 p-2 me-3 d-flex align-items-center justify-content-center">
+                        <i className="bi bi-graph-up-arrow text-warning fs-4"></i>
+                      </div>
+                      <div>
+                        <h6 className="text-muted mb-0">Total Profit</h6>
+                        <h4 className="mb-0">
+                          {formatCurrency(
+                            allLedgerData.reduce((sum, item) => sum + parseFloat(item.MonthlyProfit), 0)
+                          )}
+                        </h4>
+                      </div>
+                    </div>
+                  </Col>
+                </Row>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      )}
       
       {/* Main Content Area */}
       <Row className="g-3">
